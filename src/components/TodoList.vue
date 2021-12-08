@@ -2,7 +2,7 @@
   <section>
     <div>
         <ul>
-            <li v-for="(todoItem, index) in todoItems" class="shadow" v-bind:key="todoItem.item">
+            <li v-for="(todoItem, index) in propsdata" class="shadow" v-bind:key="todoItem.item">
                 <i class="checkBtn fas fa-check" v-bind:class="{checkBtnCompleted: todoItem.completed}" v-on:click="toggleComplete(todoItem, index)"></i>
                 <span v-bind:class="{textCompleted: todoItem.completed}">{{ todoItem.item }}</span>
                 <span class="removeBtn" v-on:click="removeTodo(todoItem, index)">
@@ -16,32 +16,15 @@
 
 <script scoped>
 export default {
-    data () {
-        return {
-            todoItems : []
-        }
-    },
-    created () {     
-        if(localStorage.length > 0){
-            for(var i = 0; i<localStorage.length; i++){
-                if(localStorage.key(i) !== 'loglevel:webpack-dev-server'){
-                   this.todoItems.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
-                    //this.todoItems.push(localStorage.key(i));
-                }
-            }
-        }
-    },
-    methods : {
-        removeTodo (todoItem, index) {
-            localStorage.removeItem(todoItem);
-            this.todoItems.splice(index,1); //특정 인덱스 배열을 지우는것
-        },
-        toggleComplete (todoItem, index) {
-            todoItem.completed = !todoItem.completed;
-            localStorage.removeItem(todoItem.item);
-            localStorage.setItem(todoItem.item, JSON.stringify(todoItem));
-        }
-    },
+  props: ['propsdata'],
+  methods : {
+      removeTodo (todoItem, index) {
+        this.$emit('removeItem', todoItem, index);
+      },
+      toggleComplete (todoItem, index) {
+        this.$emit('toggleItem', todoItem, index)
+      }
+  },
 
 
 }

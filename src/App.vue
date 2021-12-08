@@ -1,9 +1,12 @@
 <template>
   <div id="app">
     <todo-header></todo-header>
-    <todo-input></todo-input>
-    <todo-list></todo-list>
-    <todo-footer></todo-footer>
+    <todo-input v-on:addTodoItem="addOneItem"></todo-input>
+    <todo-list v-bind:propsdata="todoItems" 
+    v-on:removeItem="removeOneItem" 
+    v-on:toggleItem="toggleOneItem">
+    </todo-list>
+    <todo-footer v-on:clearAll="clearAllItems"></todo-footer>
   </div>
 </template>
 
@@ -15,6 +18,45 @@ import TodoFooter from './components/TodoFooter.vue'
 
 
 export default {
+  
+  data () {
+    return{
+      todoItems: []
+    }
+  },
+  methods: {
+    addOneItem (todoItem) {
+      var obj = {completed: false, item: todoItem};
+      localStorage.setItem(todoItem, JSON.stringify(obj));
+      this.todoItems.push(obj);
+    },
+    removeOneItem (todoItem, index) {
+        localStorage.removeItem(todoItem.item);
+        this.todoItems.splice(index,1); //특정 인덱스 배열을 지우는것
+    },
+    toggleOneItem (todoItem, index) {
+          //todoItem.completed = !todoItem.completed;
+          this.todoItems[index].completed = !this.todoItems[index].completed 
+          localStorage.removeItem(todoItem.item);
+          localStorage.setItem(todoItem.item, JSON.stringify(todoItem));
+    },
+    clearAllItems () {
+      localStorage.clear();
+      this.todoItems = [];
+
+    }
+  },
+  created () {     
+  if(localStorage.length > 0){
+      for(var i = 0; i<localStorage.length; i++){
+          if(localStorage.key(i) !== 'loglevel:webpack-dev-server'){
+              this.todoItems.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+                //this.todoItems.push(localStorage.key(i));
+            }
+        }
+    }
+  },
+
   components: {
     //컴포넌트 태그명 : 컴포넌트명
     'TodoHeader' : TodoHeader,
